@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  background: #1e1d1d;
+  color: #ffffff;
+}
+
+::selection {
+  background: rgba(17, 163, 42, 0.4);
+  color: #fff;
+}
+
+/* Scrollbars — slim, slate, with green hover */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #64748833;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #11a32a66;
+}
+
+/* Subtle glow on focus / hover for primary CTAs */
+.btn-primary {
+  background: #11a32a;
+  color: #061a09;
+  font-weight: 600;
+  transition: box-shadow 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #14b32e;
+  box-shadow: 0 0 0 1px #11a32a66, 0 0 24px -4px #11a32aa1;
+}
+.btn-ghost {
+  background: transparent;
+  color: #ffffffcc;
+  border: 1px solid #64748833;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: #11a32a66;
+  color: #fff;
+  background: rgba(17, 163, 42, 0.08);
+}
+.btn-ghost:disabled {
+  opacity: 0.4;
+}
