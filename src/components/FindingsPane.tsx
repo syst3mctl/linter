@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import type { Finding, Severity } from '../types';
+import { findingsToMarkdown } from '../lib/findings-to-text';
 
 interface Props {
   findings: Finding[];
   onJump: (f: Finding) => void;
   hasSource: boolean;
+  source: string;
+  language: 'yaml' | 'dockerfile' | 'json';
 }
 
 const SEV_ORDER: Record<Severity, number> = { error: 0, warning: 1, info: 2 };
@@ -32,7 +36,9 @@ const SEV_STYLES: Record<
   },
 };
 
-export function FindingsPane({ findings, onJump, hasSource }: Props) {
+export function FindingsPane({ findings, onJump, hasSource, source, language }: Props) {
+  const [copied, setCopied] = useState(false);
+
   const sorted = [...findings].sort((a, b) => {
     const s = SEV_ORDER[a.severity] - SEV_ORDER[b.severity];
     if (s !== 0) return s;
@@ -45,13 +51,44 @@ export function FindingsPane({ findings, onJump, hasSource }: Props) {
     info: findings.filter((f) => f.severity === 'info').length,
   };
 
+  async function copyForLLM() {
+    if (!hasSource) return;
+    const text = findingsToMarkdown(source, findings, language);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      // noop
+    }
+  }
+
   return (
     <div className="flex h-full flex-col bg-bg-card">
-      <div className="flex items-center justify-between border-b border-line px-4 py-3">
-        <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-soft">
-          Findings
-        </h2>
-        <div className="flex items-center gap-1.5 font-mono text-[10px]">
+      <div className="border-b border-line px-4 py-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-soft">
+            Findings
+          </h2>
+          <button
+            onClick={copyForLLM}
+            disabled={!hasSource}
+            title="Copy source + findings as markdown for ChatGPT / Claude / Cursor"
+            className="btn-ghost flex items-center gap-1.5 rounded px-2.5 py-1 text-[11px] font-medium"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M9 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2M9 3v2h6V3M9 3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {copied ? 'Copied' : 'Copy for LLM'}
+          </button>
+        </div>
+        <div className="mt-2.5 flex items-center gap-1.5 font-mono text-[10px]">
           <span className={`rounded px-2 py-0.5 ${SEV_STYLES.error.chip}`}>
             {counts.error} err
           </span>

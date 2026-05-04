@@ -70,6 +70,8 @@ export default function App() {
           <FindingsPane
             findings={findings}
             hasSource={!!source.trim()}
+            source={source}
+            language={language}
             onJump={(f) =>
               setJump({ line: f.pos.line, column: f.pos.column, nonce: Date.now() })
             }
